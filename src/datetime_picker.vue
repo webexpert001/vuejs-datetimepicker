@@ -1,7 +1,7 @@
 <template>
   <div :style='{width:width}' class="datetime-picker"  v-on:click='calendarClicked($event)'  v-on:blur='toggleCal' >
     <div>
-      <input type='text' :readonly="readonly" id='tj-datetime-input' :required="required" :value="date"  :name='name' v-on:click='toggleCal' autocomplete='off'  />
+      <input type='text' :readonly="readonly" id='tj-datetime-input' :required="required" :value="replaceStartDate(date)"  :name='name' v-on:click='toggleCal' autocomplete='off'  />
       <div class='calender-div' :class='{noDisplay: hideCal}'>
         <div :class='{noDisplay: hideDate}'>
           <div class='year-month-wrapper'>
@@ -70,6 +70,7 @@ import getDay from 'date-fns/get_day';
 import format from 'date-fns/format';
 import startOfDay from 'date-fns/start_of_day';
 import isEqual from 'date-fns/is_equal';
+import moment from 'moment'
 
 const days = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 const AM = 'AM'
@@ -382,6 +383,18 @@ export default {
       this.date = ''
       this.$emit('input', '')
       this.toggleCal ()
+    },
+    replaceStartDate(value) {
+      let val = moment(value)
+      if (!value || value == '') val = moment()
+      const dayOfWeek = val.day()
+      const weeks = ['日', '月', '火', '水', '木', '金', '土']
+      
+      let str = val.format('YYYY年MM月DD日 (') + weeks[dayOfWeek] + ') ' + val.format('a HH:mm')
+      
+      str = str.replace('午前', 'am').replace('午後', 'pm')
+      
+      return str
     },
   },
   created () {
