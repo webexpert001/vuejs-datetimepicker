@@ -21,7 +21,7 @@
           </div>
           <div>
             <div class="week" v-for="(week, weekIndex) in weeks" :key="weekIndex">
-              <span class="port" v-for="(day, dayIndex) in week" :key="dayIndex" v-on:click='setDay(weekIndex*7 + dayIndex, day)' :class='{activePort: (weekIndex*7 + dayIndex) === activePort}'>
+              <span class="port" v-for="(day, dayIndex) in week" :key="dayIndex" v-on:click='setDay(weekIndex*7 + dayIndex, day)' :class='{activePort: (weekIndex*7 + dayIndex) === activePort, disabled: !canSelect(day)}'>
                 {{day}}
               </span>
             </div>
@@ -92,6 +92,10 @@ export default {
       type: String,
       default: ""
     },
+    min: {
+      type: String,
+      default: ""
+    },
     required: {
       type: Boolean,
       default: false
@@ -133,7 +137,8 @@ export default {
       minuteSelectorVisible: false,
       hourSelectorVisible: false,
       period: AM,
-      periodStyle: 12
+      periodStyle: 12,
+      minDate: undefined
     }
   },
   methods: {
@@ -202,7 +207,7 @@ export default {
       this.weeks = weeks;
     },
     setDay (index, port) {
-      if (port) {
+      if (port && this.canSelect(port)) {
         this.activePort = index;
         this.day = parseInt(port, 10);
         this.timeStamp = new Date(this.year, this.monthIndex, this.day);
@@ -396,6 +401,15 @@ export default {
       
       return str
     },
+    canSelect(port) {
+      if (!this.minDate) return true
+      if (!port) return false
+
+      let day = parseInt(port, 10);
+      let month = this.monthIndex + 1
+      let val = moment(`${this.year}-${month}-${day}`)
+      return val.diff(this.minDate, 'days') >= 0
+    }
   },
   created () {
     if (this.value) {
@@ -412,6 +426,10 @@ export default {
         this.timeStamp = new Date()
         console.log(e);
       }
+    }
+
+    if (this.min) {
+      this.minDate = moment(this.min)
     }
 
     this.year = this.timeStamp.getFullYear()
@@ -705,5 +723,10 @@ export default {
     margin-top: 10px;
     cursor: pointer;
     background: transparent;
+  }
+
+  .port.disabled {
+    color: #ccc !important;
+    cursor: none !important;
   }
 </style>
