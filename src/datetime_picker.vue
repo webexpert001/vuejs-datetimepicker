@@ -431,7 +431,9 @@ export default {
     }
 
     if (this.min) {
+      console.log(this.min)
       this.minDate = moment(this.min)
+      console.log(this.minDate)
     }
 
     this.year = this.timeStamp.getFullYear()
