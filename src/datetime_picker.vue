@@ -407,6 +407,8 @@ export default {
 
       let day = parseInt(port, 10);
       let month = this.monthIndex + 1
+      month = ("0" + month).slice(-2);
+      day = ("0" + day).slice(-2);
       let val = moment(`${this.year}-${month}-${day}`)
       return val.diff(this.minDate, 'days') >= 0
     }
